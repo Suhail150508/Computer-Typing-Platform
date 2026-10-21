@@ -1,0 +1,17 @@
+# ── cPanel: প্রজেক্টের সব ফাইল public_html-এ আপলোড করলে এই ফাইল সবকিছু /public-এ পাঠিয়ে দেবে ──
+# (সবচেয়ে নিরাপদ উপায়: প্রজেক্ট public_html-এর বাইরে রেখে শুধু public/ এর ভেতরের ফাইল public_html-এ দেওয়া — DEPLOY-CPANEL.md দেখুন)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # .env, composer, storage, app ইত্যাদি কখনোই ব্রাউজার থেকে খোলা যাবে না
+    RewriteRule ^(\.env|\.git|app|bootstrap|config|database|routes|storage|tests|vendor|artisan|composer\.(json|lock)|phpunit\.xml)(/|$) - [F,L,NC]
+
+    # public/ এর ভেতরের ফাইল (css, js, uploads) সরাসরি
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # বাকি সব রিকোয়েস্ট Laravel-এ
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/index.php [L]
+</IfModule>
